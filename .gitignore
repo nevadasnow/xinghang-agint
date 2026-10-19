@@ -1,0 +1,22 @@
+node_modules/
+out/
+dist/
+.verify/
+*.log
+.DS_Store
+
+# 改动前的自动备份目录（不入库）
+.ui-backup*/
+*.orig
+.vite/
+
+# 体积巨大的本地 TTS 引擎（含模型权重，约 7GB），不入库
+IndexTTSRuntime/
+
+# 打包产物
+release/
+
+# 用户资产：背景音乐、素材库、开屏动画视频（个人素材，不入库）
+背景音乐/
+素材库/
+*.mp4

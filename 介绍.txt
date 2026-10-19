@@ -1,0 +1,49 @@
+已经看完了。这是一个 **Electron + React + TypeScript 的桌面 AI 陪伴终端**项目，产品名叫「守岸人 · 星海陪伴终端」（`package.json` 里描述为《鸣潮》守岸人主题的 AI 陪伴应用，自带 TTS 语音）。下面按文件夹逐一说明。
+
+## 核心源码
+
+- **`src/`** —— 项目源代码，分四层（与 `electron.vite.config.ts` 对应）：
+  - `main/` —— Electron 主进程：窗口/IPC（`index.ts` 57KB）、LLM 调用与工具循环（`llm.ts`、`tools.ts` 注册 100+ 工具）、会话持久化（`store.ts`）、TTS 语音（`tts.ts`/`indextts.ts`）、记忆/RAG/提醒/浏览器/终端等，以及 `prompts/` 提示词资产（4 个角色：守岸人 shorekeeper、善良米塔 kindmita、莫宁 mornye、银狼 silverwolf，每个含 soul/harness/identity/system/styles/worldbook 等 `.md`）
+  - `preload/` —— contextBridge 安全桥接（`index.ts` + 类型声明）
+  - `renderer/` —— React 界面：`pages/`（Home 首页、Chat 对话、Agent、Tasks、Docs、Memory）、`components/`（30+ 组件：设置弹窗、工具开关、Markdown、音乐、浏览器面板、标题栏等）、`state/`、`utils/`、`assets/`（角色头像/立绘/图案）
+  - `shared/` —— 主进程与渲染层共享的类型/事件定义
+
+## 构建与打包产物
+
+- **`node_modules/`** —— npm 依赖（`react`、`electron`、`echarts`、`vite` 等）
+- **`out/`** —— `electron-vite build` 的构建输出（main/preload/renderer 三份），`package.json` 的 `main` 就指向 `./out/main/index.js`
+- **`release/`** —— `electron-builder` 打包产物：`守岸人-0.1.0-setup.exe`（Windows 安装包，约 82MB）+ `win-unpacked/`（免安装目录）
+- **`build/`** —— 打包用的图标资源（`icon.ico` / `icon.png`）
+
+## TTS 语音相关
+
+- **`IndexTTSRuntime/`** —— 本地语音合成运行环境：
+  - `index-tts/` —— IndexTTS 模型本体 + `checkpoints_1_5/`（约 1.7GB 的模型权重）+ `.venv` 虚拟环境
+  - `python313/` —— 自带的嵌入式 Python 3.13（含 `python.exe` 及各类 DLL/pyd）
+  - `参考语音/` —— 各角色的参考音频（守岸人、银狼、莫宁、流萤、爱弥斯、善良米塔）
+- **`resources/`** —— 运行期资源：`indextts/runner.py`（TTS 运行脚本）+ `reference-voices/守岸人-vocals.mp3`（参考人声）
+
+## 人设资料（Markdown 文本资产）
+
+- **`新人设/`** —— **新版**人设资料，4 个角色：守岸人、花火、莫宁、银狼。每个角色一个文件夹，内含 `00-核心 / 01-语气 / 02-关系 / 03-边界 / 04-反AI味 / 05-示例 / 06-世界 / 08-预录Opus / 90-越狱 / soul.md / README.md`（这套比 `src/main/prompts/` 里的更细）
+- **`角色人设/`** —— **旧版**人设，只有 soul 单文件：善良米塔、守岸人、莫宁
+
+## 媒体素材
+
+- **`素材库/`** —— 图片/视频素材：头像、动画帧 png、测试头像、银狼立绘、几个 mp4
+- **`背景音乐/`** —— BGM（`孑遗者的故乡.mp3`、`星辉抵达之日.m4a`、`We never.m4a` 等 5 首）
+
+## 其他
+
+- **`.verify/`** —— 开发调试「工作台」（已被 `.gitignore` 忽略，**不要**放进版本库）。里面是迭代过程中留下的大量临时脚本和截图：`patch_*.py`（打补丁）、`cdp_*.mjs`/`regress_*.cjs`/`diag_*.mjs`（CDP 调试/回归测试）、`shot-*.png`（界面截图），还有 `ui-reference/`（参考成品版的设计令牌摘录）和 `cyrene-*`（解包产物）
+- **`这次任务.md`** —— 一次「UI 优化」任务的完整记录（结论、改动清单、空壳说明、后续建议）
+
+## 根目录关键文件
+
+- `package.json` / `package-lock.json` —— 项目定义与依赖锁定
+- `README.md` —— 项目说明（快速开始、模型接口配置、功能、提示词体系）
+- `electron.vite.config.ts` + `tsconfig*.json` —— 构建与 TS 配置
+- `.gitignore` —— 忽略 node_modules/out/dist/.verify 等
+- 三个 `10月xx日.mp4` —— 视频素材（非代码）
+
+需要我深入看某一个具体模块（比如 `tools.ts` 注册了哪些工具、`prompts/` 里某个人设的内容，或 `.verify/` 里的某个脚本是干嘛的）吗？

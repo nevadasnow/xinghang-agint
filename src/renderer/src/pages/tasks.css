@@ -1,0 +1,776 @@
+/* ---------------- 任务页（今日提醒管理） ---------------- */
+.tasks-page {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tasks-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 26px;
+  overflow-y: auto;
+  /* 提到 .motes 漂浮光点层（z-index:0）之上，避免被动画合成层吞掉像素（按钮点得到但看不见） */
+  position: relative;
+  z-index: 1;
+}
+
+.tasks-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tasks-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tasks-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: 0.02em;
+}
+
+.tasks-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.tasks-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ts-stat {
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--bg-mid);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.ts-stat.ts-active {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+}
+
+.tasks-body {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.tasks-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.tasks-add-main {
+  border: 1px dashed var(--accent-soft);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 10px;
+  padding: 9px 22px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tasks-add-main:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 分组 */
+.task-group {
+  margin-top: 12px;
+}
+
+.task-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--bg-mid);
+}
+
+.task-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.06em;
+}
+
+.task-group-count {
+  font-size: 11px;
+  color: var(--text-3);
+  background: var(--bg-mid);
+  border-radius: 999px;
+  padding: 0 8px;
+  line-height: 18px;
+}
+
+.trow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 6px;
+  border-bottom: 1px solid var(--bg-mid);
+}
+
+.trow:last-child {
+  border-bottom: none;
+}
+
+.trow.off {
+  opacity: 0.45;
+}
+
+.trow-time {
+  flex: none;
+  min-width: 76px;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.trow-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trow-t {
+  font-size: 14px;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trow-daily {
+  flex: none;
+  font-size: 10px;
+  color: var(--accent);
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
+  border-radius: 6px;
+  padding: 0 5px;
+}
+
+.trow-ops {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.trow:hover .trow-ops {
+  opacity: 1;
+}
+
+.trow-btn {
+  border: none;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 13px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.trow-btn:hover {
+  color: var(--text-1);
+  background: var(--bg-mid);
+}
+
+.trow-btn.trow-done {
+  color: #34b978;
+}
+
+.trow-btn.trow-del:hover {
+  color: #e26d7a;
+  background: rgba(226, 109, 122, 0.12);
+}
+
+.trow-toggle {
+  width: 28px;
+  height: 15px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bg-mid);
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  transition: background 0.15s;
+}
+
+.trow-toggle.on {
+  background: var(--accent);
+}
+
+.trow-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.12s;
+}
+
+.trow-toggle.on::after {
+  left: 15px;
+}
+
+.tasks-add {
+  margin-top: 14px;
+  width: 100%;
+  border: 1px dashed var(--accent-soft);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 10px;
+  padding: 9px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tasks-add:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---------------- 任务系统（重写：搜索栏 / 状态分组 / 编辑弹窗） ---------------- */
+
+.tasks-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 工具栏里的「＋ 新建任务」：覆盖表单全宽样式，固定为右侧紧凑按钮 */
+.tasks-toolbar .tasks-add {
+  width: auto;
+  flex: none;
+  margin-top: 0;
+  padding: 7px 14px;
+}
+
+.tasks-search {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid var(--bg-mid);
+  background: var(--bg-elevated);
+  color: var(--text-1);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.tasks-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.tasks-search::placeholder {
+  color: var(--text-3);
+}
+
+.ts-stat.ts-due {
+  color: #d9842c;
+  border-color: rgba(217, 132, 44, 0.35);
+  background: rgba(217, 132, 44, 0.12);
+}
+
+.tasks-body.card {
+  border: 1px solid var(--bg-mid);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+
+.tasks-empty-hint {
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: 6px 16px;
+}
+
+/* 优先级圆点 */
+.trow-pri {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0.85;
+}
+
+.trow-main {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.trow-t {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.trow-flag {
+  flex: none;
+  font-size: 11px;
+  color: #34b978;
+  font-weight: 600;
+}
+
+.trow-flag-cancel {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.trow-note {
+  font-size: 12px;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.trow-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 1px;
+}
+
+.trow-due {
+  font-size: 11px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.trow-due.overdue {
+  color: #e26d7a;
+  font-weight: 600;
+}
+
+.trow-tag {
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 5px;
+  padding: 1px 7px;
+}
+
+.trow-agent {
+  font-size: 10px;
+  color: var(--text-3);
+  border: 1px dashed var(--bg-mid);
+  border-radius: 5px;
+  padding: 1px 7px;
+}
+
+.trow-btn.trow-restore {
+  color: var(--accent);
+}
+
+.trow-btn.trow-restore:hover {
+  background: var(--accent-soft);
+}
+
+/* 编辑弹窗：右上浮动卡，背景不虚化（方便观察列表实时变化） */
+.task-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 120;
+}
+
+.task-editor {
+  position: absolute;
+  top: 70px;
+  right: 26px;
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--bg-mid);
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.task-editor-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.task-editor-close {
+  border: none;
+  background: none;
+  color: var(--text-3);
+  font-size: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-editor-close:hover {
+  color: var(--text-1);
+  background: var(--bg-mid);
+}
+
+.task-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.task-editor-field > span {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.task-editor-field input,
+.task-editor-field textarea {
+  border: 1px solid var(--bg-mid);
+  background: var(--bg-0);
+  color: var(--text-1);
+  border-radius: 9px;
+  padding: 8px 11px;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+
+.task-editor-field input:focus,
+.task-editor-field textarea:focus {
+  border-color: var(--accent);
+}
+
+.task-editor-hint {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.task-editor-pri {
+  display: flex;
+  gap: 8px;
+}
+
+.pri-btn {
+  flex: 1;
+  border: 1px solid var(--bg-mid);
+  background: var(--bg-0);
+  color: var(--text-2);
+  border-radius: 8px;
+  padding: 7px 0;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pri-btn:hover {
+  border-color: var(--text-3);
+}
+
+.task-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.task-editor-cancel {
+  border: 1px solid var(--bg-mid);
+  background: none;
+  color: var(--text-2);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.task-editor-cancel:hover {
+  background: var(--bg-mid);
+}
+
+.task-editor-save {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.task-editor-save:hover {
+  opacity: 0.88;
+}
+
+.task-editor-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   任务页增强：筛选标签 / 批量模式 / 拖动排序 / 统计
+   ============================================================ */
+
+/* ---------- 筛选标签 ---------- */
+.tasks-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.tf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--stroke);
+  background: var(--bg-elevated);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.tf-chip:hover {
+  border-color: var(--sk-400);
+  color: var(--text-1);
+  background: var(--bg-mid);
+}
+
+.tf-chip.on {
+  background: linear-gradient(130deg, var(--sk-accent), var(--sk-500));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(74, 156, 255, 0.28);
+}
+
+/* 逾期有内容时给个提醒色，但不用红色（避免整页焦虑） */
+.tf-chip.warn:not(.on) {
+  border-color: rgba(217, 161, 59, 0.5);
+  color: #a97a22;
+}
+
+.tf-n {
+  font-style: normal;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+/* ---------- 批量操作条 ---------- */
+.tasks-batch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+  border-radius: 11px;
+  background: rgba(74, 156, 255, 0.08);
+  border: 1px solid rgba(74, 156, 255, 0.22);
+}
+
+.tb-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sk-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.tb-sep {
+  flex: 1;
+}
+
+.tb-act {
+  height: 26px;
+  padding: 0 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--stroke);
+  background: var(--bg-elevated);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tb-act:hover:not(:disabled) {
+  border-color: var(--sk-400);
+  color: var(--text-1);
+}
+
+.tb-act:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.tb-act.ok:hover:not(:disabled) {
+  border-color: rgba(61, 158, 106, 0.55);
+  color: #2f8f5b;
+}
+
+.tb-act.del:hover:not(:disabled) {
+  border-color: rgba(226, 109, 122, 0.55);
+  color: #c85664;
+}
+
+/* 工具栏里的两个小按钮 */
+.tasks-mode,
+.tasks-clear {
+  flex: none;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: var(--bg-elevated);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.tasks-mode:hover,
+.tasks-clear:hover {
+  border-color: var(--sk-400);
+  color: var(--text-1);
+  background: var(--bg-mid);
+}
+
+.tasks-mode.on {
+  border-color: rgba(74, 156, 255, 0.4);
+  background: rgba(74, 156, 255, 0.12);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---------- 拖动排序 ---------- */
+.trow-grip {
+  flex: none;
+  width: 14px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: -2px;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  user-select: none;
+}
+
+.trow:hover .trow-grip {
+  opacity: 0.8;
+}
+
+.trow-grip:active {
+  cursor: grabbing;
+}
+
+/* 拖动经过时给出落点提示（虚线在上边表示"插到这里之前"） */
+.trow.drag-over {
+  box-shadow: inset 0 2px 0 0 var(--sk-accent);
+  background: rgba(74, 156, 255, 0.06);
+}
+
+/* ---------- 批量勾选 ---------- */
+.trow-check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  cursor: pointer;
+}
+
+.trow.checked {
+  background: rgba(74, 156, 255, 0.09);
+  border-radius: 10px;
+}
+
+/* 已逾期统计用暖色，不用刺眼的红 */
+.ts-stat.ts-over {
+  color: #a97a22;
+  background: rgba(217, 161, 59, 0.14);
+  border-color: rgba(217, 161, 59, 0.3);
+}
